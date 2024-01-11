@@ -109,8 +109,14 @@ def fool_check_letter(n):
 
 def fool_check_word(n):
     k = n
-    while not (k.isalpha() and len(k) == len(your_word)):
-        print('Please, enter the word that you think is hidden')
+    while not k.isalpha():
+        print('Please, enter the word that you think is hidden.')
+        k = input()
+    if k.isalpha() and len(k) > len(your_word):
+        print(f'This word is longer than the hidden one.')
+        k = input()
+    elif k.isalpha() and len(k) < len(your_word):
+        print(f'This word is shorter than the hidden one.')
         k = input()
     return k.upper()
 
@@ -131,7 +137,15 @@ def check_written(option, lists):
     return m
 
 
+won = 0
+lost = 0
+played = 0
+
+
 def play(hidden):
+    global won
+    global lost
+    global played
     print('Let\'s play Hangman together! I make a word and you guess. You have 6 chances to make a mistake :)')
     tries = 6
     print(display_hangman(tries))
@@ -146,9 +160,9 @@ def play(hidden):
             print('Please enter the word that you think is hidden:')
             word = check_written(fool_check_word(input()).upper(), guessed_words)
             if word == hidden:
+                won += 1
                 print('Congratulations! You guessed the word!')
                 print(hidden)
-                print(display_hangman(tries))
                 break
             else:
                 print('Unfortunately, it\'s not the correct word')
@@ -164,7 +178,7 @@ def play(hidden):
                 if letter == hidden[g]:
                     save.append(g)
             if save != []:
-                print('Congratulations! You guessed the letter!')                     # TO FIX IF MORE THAN ONE LETTER IN WORD
+                print('Congratulations! You guessed the letter!')
                 guessed_letters.append(letter)
                 for d in save:
                     word_completion = word_completion[:d]+letter+word_completion[d+1:]
@@ -176,26 +190,30 @@ def play(hidden):
                 tries -= 1
                 print(display_hangman(tries))
                 guessed_letters.append(letter)
-
-
     else:
-        if word_completion != hidden:
+        if word_completion == hidden:
+            won += 1
             print('Congratulations! You guessed the word!')
             print(hidden)
-            print(display_hangman(tries))
         elif tries == 0:
-            print(display_hangman(tries))
+            lost += 1
             print('Sorry, you lost! Try again later!', '\n', 'The hidden word was', hidden)
+    played += 1
 
 
 your_word = get_word(word_list)
+print(your_word)
 play(your_word)
 
-print('Do you want to play again? Y / N')
-answer = fool_check_yn(input())
-while answer == 'y':
-    your_word = get_word(word_list)
-    print(your_word)
-    play(your_word)
 
-print('Thanks for playing with me today! Come back any time to play again :)')
+while True:
+    print('Do you want to play again? Y / N')
+    answer = fool_check_yn(input())
+    if answer == 'y':
+        your_word = get_word(word_list)
+        print(your_word)
+        play(your_word)
+    else:
+        break
+
+print(f'Thanks for playing with me today! \nYou\'ve played {played} games.\nYou\'ve won {won} games and lost {lost} games\nCome back any time to play again :)')
